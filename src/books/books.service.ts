@@ -65,14 +65,20 @@ export class BooksService {
   async findBooksByAuthorCountry(
     country: string,
     fromYear?: number,
+    toYear?: number,
   ): Promise<Book[]> {
     const queryBuilder = this.bookRepository
       .createQueryBuilder('book')
       .leftJoinAndSelect('book.authors', 'author')
       .where('author.country = :country', { country });
 
-    if (fromYear !== undefined) {
+    if (fromYear && toYear) {
       queryBuilder.andWhere('book.year >= :fromYear', { fromYear });
+      queryBuilder.andWhere('book.year <= :toYear', { toYear });
+    } else if (fromYear && toYear === undefined) {
+      queryBuilder.andWhere('book.year >= :fromYear', { fromYear });
+    } else if (toYear && fromYear === undefined) {
+      queryBuilder.andWhere('book.year <= :toYear', { toYear });
     }
 
     const books = await queryBuilder.orderBy('book.year', 'ASC').getMany();

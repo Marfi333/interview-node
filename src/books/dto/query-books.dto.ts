@@ -11,7 +11,23 @@ export const QueryBooksSchema = z.object({
         const year = parseInt(val, 10);
         return !isNaN(year) && year >= 1000 && year <= new Date().getFullYear();
       },
-      { message: 'Year must be a valid number between 1000 and current year' },
+      {
+        message:
+          'From year must be a valid number between 1000 and current year',
+      },
+    ),
+  to: z
+    .string()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const year = parseInt(val, 10);
+        return !isNaN(year) && year >= 1000 && year <= new Date().getFullYear();
+      },
+      {
+        message: 'To year must be a valid number between 1000 and current year',
+      },
     ),
 });
 

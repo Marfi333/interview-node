@@ -28,20 +28,26 @@ export class BooksController {
   findBooksByAuthorCountry(
     @Param('country') country: string,
     @Query('from') from?: string,
+    @Query('to') to?: string,
   ): Promise<Book[]> {
     if (!country || country.trim() === '') {
       throw new BadRequestException('Country parameter is required');
     }
 
-    const validation = QueryBooksSchema.safeParse({ country, from });
+    const validation = QueryBooksSchema.safeParse({ country, from, to });
 
     if (!validation.success) {
       throw new BadRequestException(validation.error.issues[0].message);
     }
 
     const fromYear = from ? parseInt(from, 10) : undefined;
+    const toYear = to ? parseInt(to, 10) : undefined;
 
-    return this.booksService.findBooksByAuthorCountry(country, fromYear);
+    return this.booksService.findBooksByAuthorCountry(
+      country,
+      fromYear,
+      toYear,
+    );
   }
 
   @Get(':id')
