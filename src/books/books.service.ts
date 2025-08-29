@@ -62,6 +62,24 @@ export class BooksService {
     return { updated, errors };
   }
 
+  async findBooksByAuthorCountry(
+    country: string,
+    fromYear?: number,
+  ): Promise<Book[]> {
+    const queryBuilder = this.bookRepository
+      .createQueryBuilder('book')
+      .leftJoinAndSelect('book.authors', 'author')
+      .where('author.country = :country', { country });
+
+    if (fromYear !== undefined) {
+      queryBuilder.andWhere('book.year >= :fromYear', { fromYear });
+    }
+
+    const books = await queryBuilder.orderBy('book.year', 'ASC').getMany();
+
+    return books;
+  }
+
   private extractYearFromDate(dateString: string): number | null {
     const yearRegex = /\b(19|20)\d{2}\b/;
     const yearMatch = yearRegex.exec(dateString);
